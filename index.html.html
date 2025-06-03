@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 15px 15px;
+            z-index: 10;
+        }
+
+        .page {
+            display: none;
+            height: calc(100% - 44px - 80px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .profile-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .search-bar {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 25px;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .course-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .course-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .course-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .course-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .unity-icon { background: linear-gradient(135deg, #1a1a1a, #333); }
+        .swift-icon { background: linear-gradient(135deg, #ff6b35, #f7931e); }
+        .figma-icon { background: linear-gradient(135deg, #9333ea, #c084fc); }
+
+        .course-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .course-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .course-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .enrolled { background: #dcfce7; color: #16a34a; }
+        .premium { background: #fef3c7; color: #d97706; }
+        .free { background: #dbeafe; color: #2563eb; }
+
+        .price {
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f8f9fa;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .chat-container {
+            height: calc(100% - 60px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.bot .message-bubble {
+            background: #f8f9fa;
+            color: #1a1a1a;
+            border-bottom-left-radius: 6px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 10px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .course-detail {
+            padding: 20px 0;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #667eea;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .payment-methods {
+            margin-top: 20px;
+        }
+
+        .payment-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .payment-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .kaspi { color: #ed1c24; }
+        .jusan { color: #00a651; }
+        .halyk { color: #0066cc; }
+
+        .materials-list {
+            margin-top: 20px;
+        }
+
+        .material-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .material-item:hover {
+            background: #e5e7eb;
+        }
+
+        .material-item h4 {
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: #1a1a1a;
+        }
+
+        .material-item p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .action-btn {
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .profile-info {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            margin-bottom: 30px;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .profile-avatar h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #1a1a1a;
+        }
+
+        .profile-avatar p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .achievements {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .achievements h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .achievement-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .achievement-info h4 {
+            font-size: 16px;
+            margin-bottom: 2px;
+            color: #1a1a1a;
+        }
+
+        .achievement-info p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .profile-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .learning-material-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .learning-material-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .material-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .material-content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="notch"></div>
+        <div class="phone-screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+
+            <!-- Home Page -->
+            <div class="page active" id="home">
+                <div class="header">
+                    <h1>My Courses</h1>
+                    <button class="profile-btn">AI</button>
+                </div>
+
+                <input type="text" class="search-bar" placeholder="Search courses...">
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Enrolled Courses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">67%</div>
+                        <div class="stat-label">Avg Progress</div>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="openCourse('unity')">
+                    <div class="course-header">
+                        <div class="course-icon unity-icon">🎮</div>
+                        <div class="course-info">
+                            <h3>Unity C# Development</h3>
+                            <p>Game development with Unity Engine</p>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="course-status">
+                        <span class="status-badge enrolled">Enrolled</span>
+                        <span class="price">Free Access</span>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="openCourse('swift')">
+                    <div class="course-header">
+                        <div class="course-icon swift-icon">📱</div>
+                        <div class="course-info">
+                            <h3>Swift iOS Development</h3>
+                            <p>Build iOS apps with Swift</p>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                    <div class="course-status">
+                        <span class="status-badge enrolled">Enrolled</span>
+                        <span class="price">$49.99</span>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="openCourse('figma')">
+                    <div class="course-header">
+                        <div class="course-icon figma-icon">🎨</div>
+                        <div class="course-info">
+                            <h3>Figma Design Mastery</h3>
+                            <p>UI/UX Design with Figma</p>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                    <div class="course-status">
+                        <span class="status-badge free">Free Course</span>
+                        <span class="price">Free</span>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="showPage('chat')">
+                        💬<br>AI Help
+                    </button>
+                    <button class="action-btn" onclick="showPage('catalog')">
+                        📚<br>Browse More
+                    </button>
+                </div>
+            </div>
+
+            <!-- Catalog Page -->
+            <div class="page" id="catalog">
+                <div class="header">
+                    <h1>Course Catalog</h1>
+                    <button class="profile-btn">🔍</button>
+                </div>
+
+                <input type="text" class="search-bar" placeholder="Search all courses...">
+
+                <div class="course-card" onclick="openCourse('unity-advanced')">
+                    <div class="course-header">
+                        <div class="course-icon unity-icon">🎮</div>
+                        <div class="course-info">
+                            <h3>Advanced Unity 3D</h3>
+                            <p>Advanced game development techniques</p>
+                        </div>
+                    </div>
+                    <div class="course-status">
+                        <span class="status-badge premium">Premium</span>
+                        <span class="price">$79.99</span>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="openCourse('swift-advanced')">
+                    <div class="course-header">
+                        <div class="course-icon swift-icon">📱</div>
+                        <div class="course-info">
+                            <h3>SwiftUI Masterclass</h3>
+                            <p>Modern iOS app development</p>
+                        </div>
+                    </div>
+                    <div class="course-status">
+                        <span class="status-badge premium">Premium</span>
+                        <span class="price">$89.99</span>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="openCourse('figma-pro')">
+                    <div class="course-header">
+                        <div class="course-icon figma-icon">🎨</div>
+                        <div class="course-info">
+                            <h3>Figma to Code</h3>
+                            <p>Design systems and development</p>
+                        </div>
+                    </div>
+                    <div class="course-status">
+                        <span class="status-badge premium">Premium</span>
+                        <span class="price">$59.99</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat Page -->
+            <div class="page" id="chat">
+                <div class="header">
+                    <h1>AI Assistant</h1>
+                    <button class="profile-btn">🤖</button>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot">
+                            <div class="message-bubble">
+                                👋 Hi! I'm your learning assistant. I can help you with Unity C#, Swift, and Figma questions. What would you like to learn today?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your courses...">
+                        <button class="send-btn" onclick="sendMessage()">➤</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Detail Page -->
+            <div class="page" id="courseDetail">
+                <button class="back-btn" onclick="goBack()">←</button>
+                
+                <div id="courseContent">
+                    <!-- Course content will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div class="page" id="profile">
+                <div class="header">
+                    <h1>Profile</h1>
+                    <button class="profile-btn">⚙️</button>
+                </div>
+
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <div class="avatar-circle">
+                            <span class="avatar-text">JD</span>
+                        </div>
+                        <h2>John Developer</h2>
+                        <p>Learning enthusiast</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Courses Enrolled</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Hours Learned</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Certificates</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">89%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+
+                    <div class="achievements">
+                        <h3>Recent Achievements</h3>
+                        <div class="achievement-item">
+                            <span class="achievement-icon">🏆</span>
+                            <div class="achievement-info">
+                                <h4>Unity Master</h4>
+                                <p>Completed Unity C# Development</p>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <span class="achievement-icon">📱</span>
+                            <div class="achievement-info">
+                                <h4>iOS Developer</h4>
+                                <p>Built first iOS app</p>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <span class="achievement-icon">🎨</span>
+                            <div class="achievement-info">
+                                <h4>Design Pro</h4>
+                                <p>Mastered Figma prototyping</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <button class="action-btn" onclick="editProfile()">
+                            ✏️<br>Edit Profile
+                        </button>
+                        <button class="action-btn" onclick="viewCertificates()">
+                            🎓<br>Certificates
+                        </button>
+                        <button class="action-btn" onclick="settings()">
+                            ⚙️<br>Settings
+                        </button>
+                        <button class="action-btn" onclick="logout()">
+                            🚪<br>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Chat Page -->
+            <div class="page" id="learningChat">
+                <div class="header">
+                    <button class="back-btn" onclick="goBack()">←</button>
+                    <h1 id="chatTitle">AI Learning Assistant</h1>
+                    <button class="profile-btn">🤖</button>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="learningChatMessages">
+                        <div class="message bot">
+                            <div class="message-bubble">
+                                👋 Hi! I'm ready to help you learn. What would you like to know?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="learningChatInput" placeholder="Ask your question...">
+                        <button class="send-btn" onclick="sendLearningMessage()">➤</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showPage('home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="showPage('catalog')">
+                    <div class="nav-icon">📚</div>
+                    <div class="nav-label">Catalog</div>
+                </div>
+                <div class="nav-item" onclick="showPage('chat')">
+                    <div class="nav-icon">💬</div>
+                    <div class="nav-label">AI Chat</div>
+                </div>
+                <div class="nav-item" onclick="showPage('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 'home';
+        let previousPage = 'home';
+
+        const courses = {
+            unity: {
+                title: 'Unity C# Development',
+                icon: '🎮',
+                enrolled: true,
+                materials: [
+                    { title: 'Introduction to Unity', type: 'video', content: 'Unity basics and interface overview' },
+                    { title: 'C# Fundamentals', type: 'lesson', content: 'Variables, loops, and functions in C#' },
+                    { title: 'GameObject & Components', type: 'video', content: 'Understanding Unity\'s component system' },
+                    { title: 'Physics & Collisions', type: 'interactive', content: 'Hands-on physics simulation' },
+                    { title: '2D Game Project', type: 'project', content: 'Build your first 2D platformer' }
+                ]
+            },
+            swift: {
+                title: 'Swift iOS Development',
+                icon: '📱',
+                enrolled: true,
+                price: '$49.99',
+                materials: [
+                    { title: 'Swift Language Basics', type: 'video', content: 'Swift syntax and fundamentals' },
+                    { title: 'Xcode Introduction', type: 'lesson', content: 'Setting up your development environment' },
+                    { title: 'UIKit Essentials', type: 'video', content: 'Building user interfaces' },
+                    { title: 'Data & Networking', type: 'lesson', content: 'Working with APIs and data' },
+                    { title: 'App Store Deployment', type: 'guide', content: 'Publishing your first app' }
+                ]
+            },
+            figma: {
+                title: 'Figma Design Mastery',
+                icon: '🎨',
+                enrolled: true,
+                free: true,
+                materials: [
+                    { title: 'Figma Interface', type: 'video', content: 'Getting started with Figma tools' },
+                    { title: 'Design Principles', type: 'lesson', content: 'Color theory and typography' },
+                    { title: 'Prototyping', type: 'interactive', content: 'Creating interactive prototypes' },
+                    { title: 'Component Systems', type: 'video', content: 'Building reusable design components' },
+                    { title: 'Design Handoff', type: 'guide', content: 'Collaborating with developers' }
+                ]
+            },
+            'unity-advanced': {
+                title: 'Advanced Unity 3D',
+                icon: '🎮',
+                enrolled: false,
+                price: '$79.99'
+            },
+            'swift-advanced': {
+                title: 'SwiftUI Masterclass',
+                icon: '📱',
+                enrolled: false,
+                price: '$89.99'
+            },
+            'figma-pro': {
+                title: 'Figma to Code',
+                icon: '🎨',
+                enrolled: false,
+                price: '$59.99'
+            }
+        };
+
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+
+            previousPage = currentPage;
+            currentPage = pageId;
+        }
+
+        function openCourse(courseId) {
+            const course = courses[courseId];
+            if (!course) return;
+
+            previousPage = currentPage;
+            currentPage = 'courseDetail';
+
+            const courseContent = document.getElementById('courseContent');
+            
+            if (course.enrolled || course.free) {
+                // Show course materials for enrolled courses
+                courseContent.innerHTML = `
+                    <div class="course-header">
+                        <div class="course-icon ${courseId.includes('unity') ? 'unity-icon' : courseId.includes('swift') ? 'swift-icon' : 'figma-icon'}">${course.icon}</div>
+                        <div class="course-info">
+                            <h3>${course.title}</h3>
+                            <p>You have full access to this course</p>
+                        </div>
+                    </div>
+                    
+                    <div class="video-player" onclick="playVideo()">
+                        ▶️
+                    </div>
+                    
+                    <div class="materials-list">
+                        <h3>Course Materials</h3>
+                        ${course.materials ? course.materials.map(material => `
+                            <div class="material-item">
+                                <div class="material-header">
+                                    <div class="material-content">
+                                        <h4>${getTypeIcon(material.type)} ${material.title}</h4>
+                                        <p>${material.content}</p>
+                                    </div>
+                                    <button class="learning-material-btn" onclick="openMaterial('${material.title}', '${material.type}')">
+                                        🤖 Learn with AI
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('') : '<p>Materials will be available soon.</p>'}
+                    </div>
+                `;
+            } else {
+                // Show payment options for non-enrolled courses
+                courseContent.innerHTML = `
+                    <div class="course-header">
+                        <div class="course-icon ${courseId.includes('unity') ? 'unity-icon' : courseId.includes('swift') ? 'swift-icon' : 'figma-icon'}">${course.icon}</div>
+                        <div class="course-info">
+                            <h3>${course.title}</h3>
+                            <p>Premium course - ${course.price}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-methods">
+                        <h3>Choose Payment Method</h3>
+                        <button class="payment-btn kaspi" onclick="processPayment('kaspi', '${courseId}')">
+                            💳 Pay with Kaspi Bank
+                        </button>
+                        <button class="payment-btn jusan" onclick="processPayment('jusan', '${courseId}')">
+                            🏛️ Pay with Jusan Bank
+                        </button>
+                        <button class="payment-btn halyk" onclick="processPayment('halyk', '${courseId}')">
+                            🏦 Pay with Halyk Bank
+                        </button>
+                    </div>
+                `;
+            }
+
+            showPage('courseDetail');
+        }
+
+        function getTypeIcon(type) {
+            const icons = {
+                video: '🎥',
+                lesson: '📖',
+                interactive: '🎯',
+                project: '🛠️',
+                guide: '📋'
+            };
+            return icons[type] || '📝';
+        }
+
+        function openMaterial(title, type) {
+            const materialQuestions = {
+                'Introduction to Unity': 'What is Unity?',
+                'C# Fundamentals': 'What are C# fundamentals?',
+                'GameObject & Components': 'What is Unity\'s component system?',
+                'Physics & Collisions': 'How to make physics simulation?',
+                '2D Game Project': 'How to build 2D projects?',
+                'Swift Language Basics': 'What is Swift?',
+                'Xcode Introduction': 'How to code in Swift?',
+                'UIKit Essentials': 'How to build iOS interfaces?',
+                'Data & Networking': 'How to work with APIs in Swift?',
+                'App Store Deployment': 'How can I publish my app to App Store?',
+                'Figma Interface': 'What is Figma?',
+                'Design Principles': 'What are design principles?',
+                'Prototyping': 'How to create prototypes?',
+                'Component Systems': 'How to build design systems?',
+                'Design Handoff': 'How to collaborate with developers?'
+            };
+
+            const question = materialQuestions[title] || `Tell me about ${title}`;
+            startLearningChat(title, question);
+        }
+
+        function startLearningChat(materialTitle, initialQuestion) {
+            currentMaterial = materialTitle;
+            previousPage = currentPage;
+            currentPage = 'learningChat';
+
+            document.getElementById('chatTitle').textContent = materialTitle;
+            
+            const chatMessages = document.getElementById('learningChatMessages');
+            chatMessages.innerHTML = `
+                <div class="message bot">
+                    <div class="message-bubble">
+                        👋 Hi! I'm ready to help you learn about "${materialTitle}". Let me answer your question: "${initialQuestion}"
+                    </div>
+                </div>
+            `;
+
+            // Auto-generate response
+            setTimeout(() => {
+                const response = getLearningResponse(initialQuestion);
+                chatMessages.innerHTML += `
+                    <div class="message bot">
+                        <div class="message-bubble">${response}</div>
+                    </div>
+                `;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+
+            showPage('learningChat');
+        }
+
+        function sendLearningMessage() {
+            const input = document.getElementById('learningChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatMessages = document.getElementById('learningChatMessages');
+            
+            // Add user message
+            chatMessages.innerHTML += `
+                <div class="message user">
+                    <div class="message-bubble">${message}</div>
+                </div>
+            `;
+
+            input.value = '';
+
+            // Simulate AI response
+            setTimeout(() => {
+                const response = getLearningResponse(message);
+                chatMessages.innerHTML += `
+                    <div class="message bot">
+                        <div class="message-bubble">${response}</div>
+                    </div>
+                `;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getLearningResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Unity responses
+            if (lowerMessage.includes('what is unity')) {
+                return `🎮 **Unity** is a powerful cross-platform game engine that allows you to create 2D and 3D games, simulations, and interactive experiences.\n\n**Key Features:**\n• Visual editor with drag-and-drop interface\n• C# scripting for game logic\n• Cross-platform deployment\n• Built-in physics engine\n• Asset Store with thousands of resources\n\n**Perfect for:** Indie developers, studios, and beginners learning game development!\n\nWant to know more about any specific Unity feature?`;
+            } else if (lowerMessage.includes('c# fundamentals') || lowerMessage.includes('c# basics')) {
+                return `💻 **C# Fundamentals** are the building blocks of programming in Unity:\n\n**Variables:** Store data (int, float, string, bool)\n\`\`\`csharp\nint health = 100;\nfloat speed = 5.5f;\nstring playerName = "Hero";\n\`\`\`\n\n**Methods:** Functions that perform actions\n\`\`\`csharp\nvoid Jump() {\n    // Jump logic here\n}\n\`\`\`\n\n**Classes:** Blueprints for objects\n**Loops:** Repeat code (for, while)\n**Conditionals:** Make decisions (if, else)\n\nReady to dive deeper into any of these concepts?`;
+            } else if (lowerMessage.includes('component system') || lowerMessage.includes('gameobject')) {
+                return `🧩 **Unity's Component System** is the heart of Unity's architecture:\n\n**GameObject:** Container for all game objects\n**Components:** Add functionality to GameObjects\n\n**Common Components:**\n• Transform - Position, rotation, scale\n• Rigidbody - Physics simulation\n• Collider - Collision detection\n• Renderer - Visual appearance\n• Scripts - Custom behavior\n\n**Example:**\nA car GameObject might have:\n• MeshRenderer (appearance)\n• Rigidbody (physics)\n• CarController script (movement)\n\nThis modular approach makes Unity incredibly flexible! Want to learn about a specific component?`;
+            } else if (lowerMessage.includes('physics simulation') || lowerMessage.includes('physics')) {
+                return `⚡ **Physics Simulation in Unity:**\n\n**Rigidbody Component:**\n• Adds realistic physics to objects\n• Controls mass, drag, gravity\n• Enables collision responses\n\n**Colliders:**\n• BoxCollider - For cube shapes\n• SphereCollider - For round objects\n• MeshCollider - For complex shapes\n\n**Physics Materials:**\n• Control friction and bounciness\n• Make ice slippery or rubber bouncy\n\n**Code Example:**\n\`\`\`csharp\nRigidbody rb = GetComponent<Rigidbody>();\nrb.AddForce(Vector3.forward * 10f);\n\`\`\`\n\nWant to try a specific physics effect?`;
+            } else if (lowerMessage.includes('2d project') || lowerMessage.includes('2d game')) {
+                return `🎯 **Building 2D Projects in Unity:**\n\n**Setup:**\n• Create 2D project template\n• Use Sprite Renderer for graphics\n• Set camera to Orthographic\n\n**Essential 2D Components:**\n• Sprite Renderer - Display 2D images\n• Rigidbody2D - 2D physics\n• Collider2D - 2D collision detection\n• Animator - Character animations\n\n**Popular 2D Game Types:**\n• Platformers (like Mario)\n• Top-down adventures\n• Side-scrolling shooters\n• Puzzle games\n\n**Pro Tip:** Start simple - make a character move and jump first!\n\nWhich type of 2D game interests you most?`;
+            }
+            
+            // Swift responses
+            else if (lowerMessage.includes('what is swift')) {
+                return `📱 **Swift** is Apple's modern programming language for iOS, macOS, watchOS, and tvOS development.\n\n**Key Features:**\n• Safe and fast\n• Easy to read and write\n• Automatic memory management\n• Interactive playgrounds\n• Open source\n\n**Swift Syntax Example:**\n\`\`\`swift\nvar greeting = "Hello, iOS!"\nlet name = "Developer"\nprint("\\(greeting) \\(name)")\n\`\`\`\n\n**Why Choose Swift:**\n• Official Apple language\n• Growing rapidly\n• Great for beginners\n• Powerful for experts\n\nReady to write your first Swift code?`;
+            } else if (lowerMessage.includes('how to code') && lowerMessage.includes('swift')) {
+                return `💻 **How to Code in Swift:**\n\n**1. Basic Syntax:**\n\`\`\`swift\n// Variables\nvar age = 25\nlet name = "John"\n\n// Functions\nfunc greetUser(name: String) -> String {\n    return "Hello, \\(name)!"\n}\n\n// Classes\nclass Person {\n    var name: String\n    init(name: String) {\n        self.name = name\n    }\n}\n\`\`\`\n\n**2. Key Concepts:**\n• Optionals for safe coding\n• Closures for functional programming\n• Protocols for structure\n• Extensions for added functionality\n\n**3. Practice Tools:**\n• Xcode Playgrounds\n• Swift online editors\n• iOS Simulator\n\nWhat specific Swift concept would you like to explore?`;
+            } else if (lowerMessage.includes('app store') || lowerMessage.includes('publish')) {
+                return `🚀 **Publishing to App Store:**\n\n**Prerequisites:**\n• Apple Developer Account ($99/year)\n• Completed iOS app\n• App Store guidelines compliance\n\n**Steps to Publish:**\n1. **Prepare App**\n   • Test thoroughly\n   • Create app icons\n   • Write descriptions\n\n2. **App Store Connect**\n   • Create app listing\n   • Upload screenshots\n   • Set pricing\n\n3. **Submit for Review**\n   • Upload build via Xcode\n   • Wait for Apple review (1-7 days)\n\n4. **Launch!**\n   • Release when approved\n   • Monitor analytics\n   • Update regularly\n\n**Pro Tips:**\n• Follow Apple's Human Interface Guidelines\n• Test on multiple devices\n• Prepare for rejection - it's normal!\n\nNeed help with any specific step?`;
+            }
+            
+            // Figma responses
+            else if (lowerMessage.includes('design principles')) {
+                return `🎨 **Design Principles:**\n\n**1. Visual Hierarchy**\n• Guide user attention\n• Use size, color, spacing\n• Most important elements first\n\n**2. Color Theory**\n• Primary, secondary colors\n• Contrast for readability\n• Brand consistency\n\n**3. Typography**\n• Font pairing\n• Readable sizes\n• Consistent spacing\n\n**4. White Space**\n• Breathing room\n• Reduces cognitive load\n• Improves focus\n\n**5. Consistency**\n• Same elements, same style\n• Pattern recognition\n• Professional appearance\n\n**6. Accessibility**\n• Color contrast ratios\n• Readable fonts\n• Clear navigation\n\nWhich principle would you like to explore deeper?`;
+            } else if (lowerMessage.includes('prototype') || lowerMessage.includes('prototyping')) {
+                return `🔗 **Creating Prototypes in Figma:**\n\n**What is Prototyping?**\n• Interactive mockups\n• Test user flows\n• Demonstrate functionality\n\n**Figma Prototyping Steps:**\n1. **Create Frames**\n   • Different screens/states\n   • Mobile, desktop sizes\n\n2. **Add Interactions**\n   • Click triggers\n   • Hover effects\n   • Scroll behaviors\n\n3. **Set Transitions**\n   • Instant, dissolve, slide\n   • Duration and easing\n   • Smart animate\n\n4. **Test & Share**\n   • Present mode\n   • Share prototype links\n   • Gather feedback\n\n**Interaction Types:**\n• On click → Navigate to\n• While hovering → Change to\n• While pressing → Show overlay\n\n**Pro Tip:** Start simple - just link your main screens first!\n\nWant to learn about a specific interaction type?`;
+            }
+            
+            // General responses
+            else if (lowerMessage.includes('help') || lowerMessage.includes('start')) {
+                return `I can help you learn about:\n\n🎮 **Unity:**\n• What is Unity?\n• C# fundamentals\n• Component system\n• Physics simulation\n• 2D game development\n\n📱 **Swift:**\n• What is Swift?\n• How to code in Swift\n• iOS app development\n• App Store publishing\n\n🎨 **Figma:**\n• Design principles\n• Creating prototypes\n• Design systems\n• UI/UX best practices\n\nWhat would you like to learn about?`;
+            } else {
+                return `Great question! I'm here to help you learn. Could you be more specific about which topic you'd like to explore?\n\n**Popular questions:**\n• "What is Unity?"\n• "How to code in Swift?"\n• "What are design principles?"\n• "How to create prototypes?"\n• "What are C# fundamentals?"\n\nFeel free to ask anything about Unity, Swift, or Figma!`;
+            }
+        }
+
+        function playVideo() {
+            alert('Video player would start here with actual course content.');
+        }
+
+        function processPayment(bank, courseId) {
+            const course = courses[courseId];
+            alert(`Processing payment via ${bank.toUpperCase()} Bank\nCourse: ${course.title}\nPrice: ${course.price}\n\nIn a real app, this would redirect to the bank's payment gateway.`);
+        }
+
+        function goBack() {
+            showPage(previousPage);
+        }
+
+        function showProfile() {
+            showPage('profile');
+        }
+
+        function editProfile() {
+            alert('Edit profile functionality would allow users to update their information, avatar, and preferences.');
+        }
+
+        function viewCertificates() {
+            alert('Certificate gallery would display all earned certificates with download options.');
+        }
+
+        function settings() {
+            alert('Settings page would include:\n• Notification preferences\n• Language settings\n• Privacy controls\n• Account management');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                alert('Logout functionality would clear session and return to login screen.');
+            }
+        }
+
+        // Allow Enter key to send learning messages
+        document.getElementById('learningChatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendLearningMessage();
+            }
+        });
+
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Add user message
+            chatMessages.innerHTML += `
+                <div class="message user">
+                    <div class="message-bubble">${message}</div>
+                </div>
+            `;
+
+            input.value = '';
+
+            // Simulate AI response
+            setTimeout(() => {
+                const response = getAIResponse(message);
+                chatMessages.innerHTML += `
+                    <div class="message bot">
+                        <div class="message-bubble">${response}</div>
+                    </div>
+                `;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('unity') || lowerMessage.includes('game')) {
+                return `🎮 For Unity development, I recommend starting with:\n\n• Understanding GameObjects and Components\n• Learning C# basics (variables, methods, classes)\n• Practicing with 2D games first\n• Exploring the Unity Asset Store\n\nWould you like specific help with any Unity topic?`;
+            } else if (lowerMessage.includes('swift') || lowerMessage.includes('ios')) {
+                return `📱 Swift iOS development tips:\n\n• Master Swift fundamentals first\n• Learn UIKit or SwiftUI\n• Practice with Xcode Playgrounds\n• Build simple apps to start\n\nWhat specific iOS development question do you have?`;
+            } else if (lowerMessage.includes('figma') || lowerMessage.includes('design')) {
+                return `🎨 Figma design guidance:\n\n• Start with basic shapes and layouts\n• Learn about design systems\n• Practice prototyping\n• Study design principles\n\nNeed help with a specific design challenge?`;
+            } else if (lowerMessage.includes('help') || lowerMessage.includes('start')) {
+                return `I can help you with:\n\n🎮 Unity C# - Game development\n📱 Swift - iOS app development\n🎨 Figma - UI/UX design\n\nWhich topic interests you most?`;
+            } else {
+                return `I understand you're asking about "${message}". Could you be more specific about which course topic you'd like help with? I specialize in Unity, Swift, and Figma!`;
+            }
+        }
+
+        // Allow Enter key to send messages
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-scroll chat to bottom
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
+export default LearningPlatform;
